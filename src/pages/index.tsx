@@ -35,10 +35,6 @@ export default function Home() {
 		}
 	}, [])
 
-	const linkSize = useMemo(() => {
-		return calculateLinkSize(links.filter(link => !link.isSolo).length)
-	}, [links])
-
 	function calculateLinkSize(count: number): string {
 		if (count % 4 === 0) {
 			return 'solo w-96'
@@ -54,13 +50,29 @@ export default function Home() {
 					shiftHeld ? (
 						<button
 							title={`delete ${link.label}?`}
-							className={clsx('deletion', link.isSolo && 'solo w-96')}
+							className={clsx(
+								'group hover:bg-rose-950/25',
+								link.isSolo && 'solo w-96'
+							)}
 							key={link.url}
 							onClick={() => {
 								const newLinks = deleteLink(link.url)
 								setLinks(newLinks)
 							}}>
-							<Icons.TrashSimple weight='bold' />
+							<Icons.TrashSimple
+								className='hidden group-hover:block group-hover:fill-rose-600'
+								weight='bold'
+							/>
+							{Object.entries(Icons).map(
+								([name, IconComponent]) =>
+									link.icon === name && (
+										<IconComponent
+											className='group-hover:hidden'
+											key={name}
+											weight='bold'
+										/>
+									)
+							)}
 							{link.isSolo && <span>Delete?</span>}
 						</button>
 					) : (
@@ -80,7 +92,9 @@ export default function Home() {
 					)
 				)}
 				<button
-					className={linkSize}
+					className={calculateLinkSize(
+						links.filter(link => !link.isSolo).length
+					)}
 					title='Add Link'
 					onClick={() => setIsOpen(true)}>
 					<Plus weight='bold' />

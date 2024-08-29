@@ -32,14 +32,6 @@
 		@apply col-span-4 flex-col gap-2;
 	}
 
-	main button.deletion {
-		@apply bg-rose-950/25 text-rose-800 hover:bg-rose-950/40;
-	}
-
-	main button.deletion svg {
-		@apply fill-rose-800;
-	}
-
 	main a svg,
 	main button svg {
 		@apply size-5 fill-neutral-200;

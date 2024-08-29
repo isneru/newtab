@@ -170,6 +170,11 @@ export const Modal = ({ isOpen, setIsOpen, setLinks }: Props) => {
 					</button>
 				</div>
 			</Dialog.Content>
+			{isOpen && (
+				<p className='absolute bottom-6 left-1/2 z-[120] -translate-x-1/2 whitespace-nowrap rounded-lg border border-yellow-500/25 bg-neutral-950 p-2 text-center text-sm text-yellow-500'>
+					(Added links are deletable by holding the Shift key)
+				</p>
+			)}
 		</Dialog.Root>
 	)
 }
