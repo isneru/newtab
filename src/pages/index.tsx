@@ -51,7 +51,7 @@ export default function Home() {
 						<button
 							title={`delete ${link.label}?`}
 							className={clsx(
-								'group hover:bg-rose-950/25',
+								'group hover:bg-rose-950/25 hover:text-rose-600',
 								link.isSolo && 'solo w-96'
 							)}
 							key={link.url}
@@ -73,7 +73,7 @@ export default function Home() {
 										/>
 									)
 							)}
-							{link.isSolo && <span>Delete?</span>}
+							{link.isSolo && <span>{link.label}</span>}
 						</button>
 					) : (
 						<a
