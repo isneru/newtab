@@ -1,5 +1,5 @@
 import { Layout, Modal } from '@components'
-import { getAllLinks, type Link } from '@lib/localStorage'
+import { deleteLink, getAllLinks, type Link } from '@lib/localStorage'
 import { Plus } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 import * as Icons from '@components/selected-icons'
@@ -8,9 +8,31 @@ import clsx from 'clsx'
 export default function Home() {
 	const [isOpen, setIsOpen] = useState(false)
 	const [links, setLinks] = useState<Link[]>([])
+	const [shiftHeld, setShiftHeld] = useState(false)
 
 	useEffect(() => {
 		setLinks(getAllLinks())
+	}, [])
+
+	function downHandler({ key }: { key: string }) {
+		if (key === 'Shift') {
+			setShiftHeld(true)
+		}
+	}
+
+	function upHandler({ key }: { key: string }) {
+		if (key === 'Shift') {
+			setShiftHeld(false)
+		}
+	}
+
+	useEffect(() => {
+		window.addEventListener('keydown', downHandler)
+		window.addEventListener('keyup', upHandler)
+		return () => {
+			window.removeEventListener('keydown', downHandler)
+			window.removeEventListener('keyup', upHandler)
+		}
 	}, [])
 
 	const linkSize = useMemo(() => {
@@ -20,8 +42,6 @@ export default function Home() {
 	function calculateLinkSize(count: number): string {
 		if (count % 4 === 0) {
 			return 'solo w-96'
-		} else if (count % 4 === 1) {
-			return 'col-span-2'
 		} else {
 			return `col-span-${4 - (count % 4)}`
 		}
@@ -30,21 +50,37 @@ export default function Home() {
 	return (
 		<Layout title='New Tab'>
 			<main>
-				{links?.map(link => (
-					<a
-						title={link.label}
-						className={link.isSolo ? 'solo' : ''}
-						key={link.url}
-						href={link.url}>
-						{Object.entries(Icons).map(
-							([name, IconComponent]) =>
-								link.icon === name && <IconComponent key={name} weight='bold' />
-						)}
-						{link.isSolo && <span>{link.label}</span>}
-					</a>
-				))}
+				{links?.map(link =>
+					shiftHeld ? (
+						<button
+							title={`delete ${link.label}?`}
+							className={clsx('deletion', link.isSolo && 'solo w-96')}
+							key={link.url}
+							onClick={() => {
+								const newLinks = deleteLink(link.url)
+								setLinks(newLinks)
+							}}>
+							<Icons.TrashSimple weight='bold' />
+							{link.isSolo && <span>Delete?</span>}
+						</button>
+					) : (
+						<a
+							title={link.label}
+							className={link.isSolo ? 'solo' : ''}
+							key={link.url}
+							href={link.url}>
+							{Object.entries(Icons).map(
+								([name, IconComponent]) =>
+									link.icon === name && (
+										<IconComponent key={name} weight='bold' />
+									)
+							)}
+							{link.isSolo && <span>{link.label}</span>}
+						</a>
+					)
+				)}
 				<button
-					className={clsx('', linkSize)}
+					className={linkSize}
 					title='Add Link'
 					onClick={() => setIsOpen(true)}>
 					<Plus weight='bold' />

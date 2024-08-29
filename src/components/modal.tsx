@@ -17,6 +17,7 @@ export const Modal = ({ isOpen, setIsOpen, setLinks }: Props) => {
 	const [isSolo, setIsSolo] = useState(false)
 	const [label, setLabel] = useState('')
 	const [url, setUrl] = useState('')
+	const [iconSearch, setIconSearch] = useState('')
 
 	function toggleModal() {
 		setIsOpen(!isOpen)
@@ -24,6 +25,7 @@ export const Modal = ({ isOpen, setIsOpen, setLinks }: Props) => {
 		setIsSolo(false)
 		setLabel('')
 		setUrl('')
+		setIconSearch('')
 	}
 
 	function addLink() {
@@ -67,6 +69,7 @@ export const Modal = ({ isOpen, setIsOpen, setLinks }: Props) => {
 							New Link URL
 						</label>
 						<input
+							autoFocus
 							id='newLinkUrl'
 							placeholder='https://example.com'
 							onChange={e => setUrl(e.target.value)}
@@ -129,26 +132,36 @@ export const Modal = ({ isOpen, setIsOpen, setLinks }: Props) => {
 						</fieldset>
 					</div>
 					<div className='grid grid-cols-6 items-center justify-center gap-3 overflow-y-scroll rounded-lg border border-neutral-200/10 bg-neutral-950 px-12 py-6 shadow'>
-						{Object.entries(Icons).map(([name, IconComponent]) => (
-							<button
-								key={name}
-								title={trimIconName(name)}
-								className={clsx(
-									'grid max-w-[84px] items-center justify-center rounded-lg p-8 transition-colors focus:outline-none',
-									selectedIcon === name &&
-										'bg-emerald-900 hover:bg-emerald-800',
-									selectedIcon !== name && 'bg-neutral-900 hover:bg-neutral-800'
-								)}
-								onClick={() => {
-									setSelectedIcon(name as keyof typeof Icons)
-									console.log({ name, IconComponent, selectedIcon })
-								}}>
-								<IconComponent
-									className='size-5 fill-neutral-200'
-									weight='bold'
-								/>
-							</button>
-						))}
+						<input
+							className='col-span-6 mb-2 rounded-lg border border-neutral-200/10 bg-neutral-950 p-2 text-neutral-200 outline-none placeholder:text-neutral-600'
+							placeholder='Search icon'
+							onChange={e => setIconSearch(e.target.value)}
+							value={iconSearch}
+							type='text'
+						/>
+						{Object.entries(Icons).map(([name, IconComponent]) => {
+							if (!name.toLowerCase().includes(iconSearch.toLowerCase())) {
+								return null
+							}
+							return (
+								<button
+									key={name}
+									title={trimIconName(name)}
+									className={clsx(
+										'grid max-w-[84px] items-center justify-center rounded-lg p-8 transition-colors focus:outline-none',
+										selectedIcon === name &&
+											'bg-emerald-900 hover:bg-emerald-800',
+										selectedIcon !== name &&
+											'bg-neutral-900 hover:bg-neutral-800'
+									)}
+									onClick={() => setSelectedIcon(name as keyof typeof Icons)}>
+									<IconComponent
+										className='size-5 fill-neutral-200'
+										weight='bold'
+									/>
+								</button>
+							)
+						})}
 					</div>
 					<button
 						className='rounded-lg border border-emerald-700 bg-emerald-800 p-2 text-sm font-bold uppercase text-neutral-200 transition-colors hover:bg-emerald-700'

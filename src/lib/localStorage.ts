@@ -29,3 +29,13 @@ export function createLink(input: Link, callback?: () => void): Link[] {
 export function getAllLinks(): Link[] {
 	return JSON.parse(localStorage.getItem('links') ?? '[]')
 }
+
+export function deleteLink(url: string, callback?: () => void): Link[] {
+	const links = JSON.parse(localStorage.getItem('links') ?? '[]')
+	const newLinks = links.filter((link: Link) => link.url !== url)
+	localStorage.setItem('links', JSON.stringify(newLinks))
+
+	callback?.()
+
+	return newLinks
+}
