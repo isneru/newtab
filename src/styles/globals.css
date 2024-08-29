@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	body {
+		@apply flex h-screen w-screen items-center justify-center bg-neutral-950 font-bold text-neutral-200 antialiased;
+	}
+
+	main {
+		@apply grid max-w-96 grid-cols-main items-center justify-center gap-4;
+	}
+
+	main a,
+	main button {
+		@apply flex items-center justify-center rounded-lg bg-neutral-900 p-4 outline-none transition-colors hover:bg-neutral-800;
+	}
+
+	code {
+		@apply rounded-[0.25rem] bg-neutral-900 px-2 py-1 font-normal text-neutral-200;
+	}
+}
+
+@layer utilities {
+	main a:not(.solo),
+	main button:not(.solo) {
+		@apply p-8;
+	}
+
+	main a.solo,
+	main button.solo {
+		@apply col-span-4 flex-col gap-2;
+	}
+
+	main a svg,
+	main button svg {
+		@apply size-5 fill-neutral-200;
+	}
+
+	.utils {
+		@apply absolute bottom-8 left-8 flex flex-col gap-4;
+	}
+
+	@keyframes overlay-show {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes overlay-hide {
+		from {
+			opacity: 1;
+		}
+		to {
+			opacity: 0;
+		}
+	}
+
+	@keyframes content-show {
+		from {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.95);
+		}
+		to {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+	}
+
+	@keyframes content-hide {
+		from {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.95);
+		}
+	}
+}
