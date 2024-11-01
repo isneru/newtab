@@ -7,7 +7,7 @@ export type Link = {
 	icon: string
 }
 
-const schema = z.object({
+export const linkSchema = z.object({
 	label: z.string().min(1),
 	isSolo: z.boolean(),
 	url: z.string().url(),
@@ -15,7 +15,7 @@ const schema = z.object({
 })
 
 export function createLink(input: Link, callback?: () => void): Link[] {
-	const data = schema.parse(input)
+	const data = linkSchema.parse(input)
 
 	let links = JSON.parse(localStorage.getItem('links') ?? '[]')
 	links.push(data)

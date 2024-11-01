@@ -1,9 +1,6 @@
-import { Layout, Modal } from '@components'
-import { deleteLink, getAllLinks, type Link } from '@lib/localStorage'
-import { Plus } from '@phosphor-icons/react'
-import { useEffect, useMemo, useState } from 'react'
-import * as Icons from '@components/selected-icons'
-import clsx from 'clsx'
+import { Layout, LinkButton, Modal, ShareButtons } from '@components'
+import { getAllLinks, type Link } from '@lib/localStorage'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
 	const [isOpen, setIsOpen] = useState(false)
@@ -14,14 +11,23 @@ export default function Home() {
 		setLinks(getAllLinks())
 	}, [])
 
-	function downHandler({ key }: { key: string }) {
-		if (key === 'Shift') {
+	function downHandler(e: KeyboardEvent) {
+		if (isOpen) return
+
+		if (e.key === 'Shift') {
 			setShiftHeld(true)
+		}
+
+		if (e.ctrlKey && e.key === 'n') {
+			e.preventDefault()
+			setIsOpen(true)
 		}
 	}
 
-	function upHandler({ key }: { key: string }) {
-		if (key === 'Shift') {
+	function upHandler(e: KeyboardEvent) {
+		if (isOpen) return
+
+		if (e.key === 'Shift') {
 			setShiftHeld(false)
 		}
 	}
@@ -29,91 +35,32 @@ export default function Home() {
 	useEffect(() => {
 		window.addEventListener('keydown', downHandler)
 		window.addEventListener('keyup', upHandler)
+		window.addEventListener('blur', () => setShiftHeld(false))
 		return () => {
 			window.removeEventListener('keydown', downHandler)
 			window.removeEventListener('keyup', upHandler)
+			window.removeEventListener('blur', () => setShiftHeld(false))
 		}
 	}, [])
-
-	function calculateLinkSize(count: number): string {
-		if (count % 4 === 0) {
-			return 'solo w-96'
-		} else {
-			return `col-span-${4 - (count % 4)}`
-		}
-	}
 
 	return (
 		<Layout title='New Tab'>
 			<main>
-				{links?.map(link =>
-					shiftHeld ? (
-						<button
-							title={`delete ${link.label}?`}
-							className={clsx(
-								'group hover:bg-rose-950/25 hover:text-rose-600',
-								link.isSolo && 'solo w-96'
-							)}
-							key={link.url}
-							onClick={() => {
-								const newLinks = deleteLink(link.url)
-								setLinks(newLinks)
-							}}>
-							<Icons.TrashSimple
-								className='hidden group-hover:block group-hover:fill-rose-600'
-								weight='bold'
-							/>
-							{Object.entries(Icons).map(
-								([name, IconComponent]) =>
-									link.icon === name && (
-										<IconComponent
-											className='group-hover:hidden'
-											key={name}
-											weight='bold'
-										/>
-									)
-							)}
-							{link.isSolo && <span>{link.label}</span>}
-						</button>
-					) : (
-						<a
-							title={link.label}
-							className={link.isSolo ? 'solo' : ''}
-							key={link.url}
-							href={link.url}>
-							{Object.entries(Icons).map(
-								([name, IconComponent]) =>
-									link.icon === name && (
-										<IconComponent key={name} weight='bold' />
-									)
-							)}
-							{link.isSolo && <span>{link.label}</span>}
-						</a>
-					)
-				)}
-				<button
-					className={calculateLinkSize(
-						links.filter(link => !link.isSolo).length
-					)}
-					title='Add Link'
-					onClick={() => setIsOpen(true)}>
-					<Plus weight='bold' />
-					{calculateLinkSize(
-						links.filter(link => !link.isSolo).length
-					).includes('solo') && <span>Add Link</span>}
-				</button>
+				{links?.map((link, id) => (
+					<LinkButton
+						link={link}
+						setLinks={setLinks}
+						shiftHeld={shiftHeld}
+						key={id}
+					/>
+				))}
 			</main>
 			<div className='utils'>
 				<p>
-					Press <code>Ctrl + T</code> to open a new tab.
-				</p>
-				<p>
-					Press <code>Ctrl + W</code> to close the current tab.
-				</p>
-				<p>
-					Press <code>Ctrl + Shift + T</code> to reopen the last closed tab.
+					Press <code>Ctrl + N</code> to add a new link.
 				</p>
 			</div>
+			<ShareButtons setLinks={setLinks} links={links} />
 			<Modal setLinks={setLinks} isOpen={isOpen} setIsOpen={setIsOpen} />
 		</Layout>
 	)
